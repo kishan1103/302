@@ -1,0 +1,49 @@
+create database assi7;
+use assi7;
+
+create table library (
+    book_id int primary key,
+    title varchar(100),
+    author varchar(100),
+    published_date date
+);
+
+create table library_audit (
+    audit_id int auto_increment primary key,
+    book_id int,
+    title varchar(100),
+    author varchar(100),
+    published_date date,
+    action varchar(10),
+    action_time datetime default current_timestamp
+);
+
+delimiter //
+create trigger after_update_library
+after update on library
+for each row
+begin
+    insert into library_audit (book_id, title, author, published_date, action)
+    values (old.book_id, old.title, old.author, old.published_date, 'update');
+end //
+delimiter ;
+
+delimiter //
+create trigger after_delete_library
+after delete on library
+for each row
+begin
+    insert into library_audit (book_id, title, author, published_date, action)
+    values (old.book_id, old.title, old.author, old.published_date, 'delete');
+end //
+delimiter ;
+
+insert into library values (1, '1984', 'george orwell', '1949-06-08');
+insert into library values (2, 'to kill a mockingbird', 'harper lee', '1960-07-11');
+
+update library set title = 'nineteen eighty-four' where book_id = 1;
+
+delete from library where book_id = 2;
+
+select * from library_audit;
+select * from library;

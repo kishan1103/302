@@ -1,0 +1,41 @@
+create database example11;
+
+use example11;
+
+create table students (
+    student_id int auto_increment primary key,
+    student_name varchar(100),
+    marks int,
+    grade_category varchar(50)
+);
+
+delimiter //
+
+create procedure proc_Grade(in student_marks int, in student_name varchar(100))
+begin
+    declare category varchar(50);
+
+    if student_marks >= 990 and student_marks <= 1500 then
+        set category = 'Distinction';
+    elseif student_marks >= 900 and student_marks <= 989 then
+        set category = 'First Class';
+    elseif student_marks >= 825 and student_marks < 900 then
+        set category = 'Second Class';
+    elseif student_marks < 825 then
+        set category = 'Pass';
+    else
+        set category = 'Invalid Marks';
+    end if;
+
+    insert into students (student_name, marks, grade_category)
+    values (student_name, student_marks, category);
+end //
+
+delimiter ;
+
+call proc_Grade(1000, 'Alice');
+call proc_Grade(950, 'Bob');
+call proc_Grade(850, 'Charlie');
+call proc_Grade(800, 'David');
+
+select * from students;
